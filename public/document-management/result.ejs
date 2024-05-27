@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="styles/style.css">
+</head>
+<body>
+  <header>
+    <h1 id="pageTitle"><%= title %></h1>
+  </header>
+  <div id="content">
+    <h2>Свойства документа</h2>
+    <ul>
+      <% for (let key in properties) { %>
+        <li><%= key %>: <%= properties[key] %></li>
+      <% } %>
+    </ul>
+    <h2>Метаданные документа</h2>
+    <ul>
+      <% for (let key in metadata) { %>
+        <li><%= key %>: <%= metadata[key] %></li>
+      <% } %>
+    </ul>
+    <h2>Содержимое документа</h2>
+    <pre><%= content %></pre>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,42 @@
+<!-- public/document-management/index.html -->
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>СИСТЕМА ДОКУМЕНТООБОРОТА</title>
+    <link rel="shortcut icon" href="../media/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="../media/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="styles/style.css">
+</head>
+<body>
+<header>
+    <h1 id="pageTitle">СИСТЕМА ДОКУМЕНТООБОРОТА</h1>
+</header>
+<div id="content">
+    <form id="uploadForm" enctype="multipart/form-data" action="/document-management/upload" method="post">
+        <label for="docxFile">Выберите файл .docx:</label>
+        <input type="file" id="docxFile" name="docxFile" required>
+        <button type="submit">Загрузить</button>
+    </form>
+    <div id="documentList"></div>
+</div>
+
+<!-- Модальное окно для отображения информации о документе -->
+<div id="documentModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeDocumentModal()">&times;</span>
+        <h2 id="documentTitle"></h2>
+        <h3>Свойства документа</h3>
+        <ul id="documentProperties"></ul>
+        <h3>Метаданные документа</h3>
+        <ul id="documentMetadata"></ul>
+        <h3>Содержимое документа</h3>
+        <pre id="documentContent"></pre>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
