@@ -43,11 +43,7 @@
                 <div id="rejectedDocuments"></div>
             </section>
         </div>
-
-
     </div>
-
-
 
     <!-- Модальное окно для отображения информации о документе -->
     <div id="documentModal" class="modal">
@@ -58,10 +54,49 @@
             <ul id="documentProperties"></ul>
             <h3>Метаданные документа</h3>
             <ul id="documentMetadata"></ul>
+            <!-- Добавьте это в модальное окно перед заголовком "Содержимое документа" -->
+            <div id="signatureInfo">
+                <h3>Электронная подпись</h3>
+                <div id="signatureDetails" class="signature-details">
+                    <div class="signature-type-container">
+                        <img src="../media/MIREA_logo.png" alt="MIREA Logo" class="signature-logo">
+                        <p class="signature-type">Не подписано</p>
+                    </div>
+                </div>
+            </div>
+
             <h3>Содержимое документа</h3>
             <pre id="documentContent"></pre>
         </div>
     </div>
+
+    <!-- Добавьте это в модальное окно для ввода данных электронной подписи -->
+    <div id="signatureModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeSignatureModal()">&times;</span>
+            <h2>Электронная подпись</h2>
+            <form id="signatureForm">
+                <label for="certificateNumber">Номер сертификата:</label>
+                <input type="text" id="certificateNumber" name="certificateNumber" required>
+                <label for="owner">Владелец:</label>
+                <input type="text" id="owner" name="owner" required>
+                <label for="validFrom">Действителен с:</label>
+                <input type="date" id="validFrom" name="validFrom" required>
+                <label for="validTo">по:</label>
+                <input type="date" id="validTo" name="validTo" required>
+                <label for="type">Вид подписи:</label>
+                <select id="type" name="type" required>
+                    <option value="ПЭП">Простая электронная подпись (ПЭП)</option>
+                    <option value="УНЭП">Усиленная неквалифицированная электронная подпись (УНЭП)</option>
+                    <option value="УКЭП">Усиленная квалифицированная электронная подпись (УКЭП)</option>
+                </select>
+                <button type="submit">Принять</button>
+                <button type="button" onclick="closeSignatureModal()">Закрыть</button>
+            </form>
+        </div>
+    </div>
+
+
 
     <div id="errorBanner">Ошибка: можно загружать только файлы с расширением .docx</div>
 

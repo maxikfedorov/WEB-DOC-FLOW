@@ -36,9 +36,7 @@ app.get('/', (req, res) => {
 // Подключение маршрутов архива
 archiveRoutes(app);
 
-
 app.use('/document-management', documentRoutes); // Подключение маршрутов документооборота
-
 
 // Запуск сервера
 app.listen(PORT, () => {

@@ -1,6 +1,5 @@
 const path = require("path");
 const Database = require("better-sqlite3");
-
 const db = new Database(path.join(__dirname, "..", "db", "database.db"));
 
 // Создание таблиц в базе данных, если они не существуют
@@ -43,7 +42,6 @@ db.exec(`
         commentDate DATETIME,
         FOREIGN KEY (fileId) REFERENCES files(id)
     );
-
     CREATE TABLE IF NOT EXISTS documents (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         filename TEXT,
@@ -52,9 +50,18 @@ db.exec(`
         metadata TEXT,
         content TEXT,
         data BLOB,
-        status TEXT DEFAULT 'Ожидание'
+        status TEXT DEFAULT 'Ожидание',
+        signatureId INTEGER,
+        FOREIGN KEY (signatureId) REFERENCES signatures(id)
     );
-
+    CREATE TABLE IF NOT EXISTS signatures (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        certificateNumber TEXT,
+        owner TEXT,
+        validFrom DATE,
+        validTo DATE,
+        type TEXT
+    );
 `);
 
 module.exports = db;

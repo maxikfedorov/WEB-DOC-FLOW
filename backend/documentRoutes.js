@@ -10,61 +10,61 @@ const upload = multer({ dest: "uploads/" });
 const iconv = require("iconv-lite");
 
 router.post("/upload", upload.single("docxFile"), async (req, res) => {
-	const filePath = path.join(__dirname, "..", req.file.path);
-	const fileBuffer = fs.readFileSync(filePath);
+    const filePath = path.join(__dirname, "..", req.file.path);
+    const fileBuffer = fs.readFileSync(filePath);
 
-	try {
-		req.file.originalname = iconv.decode(
-			Buffer.from(req.file.originalname, "latin1"),
-			"utf-8",
-		);
-		const result = await mammoth.extractRawText({ buffer: fileBuffer });
-		let content = result.value;
-		content = content.replace(/(\r\n|\n|\r){2,}/g, "\n").trim();
-		const metadata = await getMetadata(fileBuffer);
-		const properties = {
-			pages: metadata.pages,
-			words: metadata.words,
-			characters: metadata.characters,
-			lines: metadata.lines,
-			paragraphs: metadata.paragraphs,
-			template: metadata.template,
-		};
-		const documentMetadata = {
-			creator: metadata.creator,
-			lastModifiedBy: metadata.lastModifiedBy,
-			revision: metadata.revision,
-			created: metadata.created,
-			modified: metadata.modified,
-		};
+    try {
+        req.file.originalname = iconv.decode(
+            Buffer.from(req.file.originalname, "latin1"),
+            "utf-8"
+        );
+        const result = await mammoth.extractRawText({ buffer: fileBuffer });
+        let content = result.value;
+        content = content.replace(/(\r\n|\n|\r){2,}/g, "\n").trim();
+        const metadata = await getMetadata(fileBuffer);
+        const properties = {
+            pages: metadata.pages,
+            words: metadata.words,
+            characters: metadata.characters,
+            lines: metadata.lines,
+            paragraphs: metadata.paragraphs,
+            template: metadata.template,
+        };
+        const documentMetadata = {
+            creator: metadata.creator,
+            lastModifiedBy: metadata.lastModifiedBy,
+            revision: metadata.revision,
+            created: metadata.created,
+            modified: metadata.modified,
+        };
 
-		const stmt = db.prepare(`
-        INSERT INTO documents (filename, title, properties, metadata, content, data)
-        VALUES (?, ?, ?, ?, ?, ?)
-      `);
-		stmt.run(
-			req.file.originalname,
-			metadata.title || "Заголовок документа",
-			JSON.stringify(properties),
-			JSON.stringify(documentMetadata),
-			content,
-			fileBuffer,
-		);
+        const stmt = db.prepare(`
+            INSERT INTO documents (filename, title, properties, metadata, content, data)
+            VALUES (?, ?, ?, ?, ?, ?)
+        `);
+        stmt.run(
+            req.file.originalname,
+            metadata.title || "Заголовок документа",
+            JSON.stringify(properties),
+            JSON.stringify(documentMetadata),
+            content,
+            fileBuffer
+        );
 
-		res.json({
-			title: metadata.title || "Заголовок документа",
-			properties,
-			metadata: documentMetadata,
-			content,
-		});
-	} catch (error) {
-		console.error("Ошибка при обработке файла:", error);
-		res.status(500).json({
-			error: `Ошибка при обработке файла: ${error.message}`,
-		});
-	} finally {
-		fs.unlinkSync(filePath);
-	}
+        res.json({
+            title: metadata.title || "Заголовок документа",
+            properties,
+            metadata: documentMetadata,
+            content,
+        });
+    } catch (error) {
+        console.error("Ошибка при обработке файла:", error);
+        res.status(500).json({
+            error: `Ошибка при обработке файла: ${error.message}`,
+        });
+    } finally {
+        fs.unlinkSync(filePath);
+    }
 });
 
 router.get("/documents", (req, res) => {
@@ -132,12 +132,33 @@ router.post('/update-status/:id', (req, res) => {
   res.sendStatus(200);
 });
 
-// Маршрут для подписания документа
-router.post('/sign/:id', (req, res) => {
-  const id = parseInt(req.params.id);
-  const updateStmt = db.prepare(`UPDATE documents SET status = 'Подписанный' WHERE id = ?`);
-  updateStmt.run(id);
-  res.sendStatus(200);
+router.post("/sign/:id", (req, res) => {
+    const id = parseInt(req.params.id);
+    const { certificateNumber, owner, validFrom, validTo, type } = req.body;
+
+    const insertSignatureStmt = db.prepare(`
+        INSERT INTO signatures (certificateNumber, owner, validFrom, validTo, type)
+        VALUES (?, ?, ?, ?, ?)
+    `);
+    const signatureInfo = insertSignatureStmt.run(certificateNumber, owner, validFrom, validTo, type);
+
+    const updateDocumentStmt = db.prepare(`
+        UPDATE documents SET status = 'Подписанный', signatureId = ? WHERE id = ?
+    `);
+    updateDocumentStmt.run(signatureInfo.lastInsertRowid, id);
+
+    res.sendStatus(200);
+});
+
+// Маршрут для получения данных подписи по ID
+router.get('/signatures/:id', (req, res) => {
+    const id = parseInt(req.params.id);
+    const stmt = db.prepare(`SELECT * FROM signatures WHERE id = ?`);
+    const signature = stmt.get(id);
+    if (!signature) {
+        return res.status(404).send("Подпись не найдена");
+    }
+    res.json(signature);
 });
 
 // Маршрут для отклонения документа
@@ -171,6 +192,8 @@ router.post('/destroy/:id', (req, res) => {
   deleteStmt.run(id);
   res.sendStatus(200);
 });
+
+
 
 
 // Маршрут для получения документов по статусу
