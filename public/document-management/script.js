@@ -1,77 +1,142 @@
 document.addEventListener('DOMContentLoaded', function() {
   const pageTitle = document.getElementById('pageTitle');
   pageTitle.addEventListener('click', function() {
-    window.location.href = '/archive';
+      window.location.href = '/archive';
   });
 
   const uploadForm = document.getElementById('uploadForm');
-  const docxFileInput = document.getElementById('docxFile');
-  const documentList = document.getElementById('documentList');
+  const docxFileInput = document.createElement('input');
+  docxFileInput.type = 'file';
+  docxFileInput.style.display = 'none';
+  docxFileInput.name = 'docxFile';
+  docxFileInput.required = true;
+  uploadForm.appendChild(docxFileInput);
 
-  uploadForm.addEventListener('submit', async function(event) {
-    event.preventDefault();
-    const formData = new FormData();
-    formData.append('docxFile', docxFileInput.files[0]);
-    const response = await fetch('/document-management/upload', { method: 'POST', body: formData });
-    if (response.ok) {
-      loadDocuments();
-    } else {
-      alert('Ошибка при загрузке файла');
-    }
+  const dropZone = document.getElementById('dropZone');
+  dropZone.addEventListener('dragover', (event) => {
+      event.preventDefault();
+      dropZone.classList.add('dragover');
+  });
+  dropZone.addEventListener('dragleave', () => {
+      dropZone.classList.remove('dragover');
+  });
+  dropZone.addEventListener('drop', (event) => {
+      event.preventDefault();
+      dropZone.classList.remove('dragover');
+      const files = event.dataTransfer.files;
+      if (files.length > 0) {
+          handleFile(files[0]);
+      }
+  });
+  dropZone.addEventListener('click', () => {
+      docxFileInput.click();
+  });
+  docxFileInput.addEventListener('change', () => {
+      if (docxFileInput.files.length > 0) {
+          handleFile(docxFileInput.files[0]);
+      } else {
+          dropZone.textContent = 'Перетащите файлы .DOCX сюда или нажмите для выбора';
+      }
   });
 
-  window.loadDocuments = async function() { // Сделать функцию глобальной
-    const response = await fetch('/document-management/documents');
-    if (response.ok) {
-      const documents = await response.json();
-      documentList.innerHTML = '';
-      documents.forEach(doc => {
-        const docCard = document.createElement('div');
-        docCard.className = 'document-card';
-        docCard.innerHTML = `
-          <p class="document-filename">${doc.filename}</p>
-          <button class="details-button" onclick="showDocumentDetails(${doc.id})">Подробнее</button>
-          <button class="archive-button" onclick="archiveDocument(${doc.id})">В Архив</button>
-        `;
-        documentList.appendChild(docCard);
-      });
-    } else {
-      alert('Ошибка при загрузке списка документов');
-    }
+  uploadForm.addEventListener('submit', async function(event) {
+      event.preventDefault();
+      const formData = new FormData();
+      if (docxFileInput.files.length > 0) {
+          formData.append('docxFile', docxFileInput.files[0]);
+          const response = await fetch('/document-management/upload', {
+              method: 'POST',
+              body: formData
+          });
+          if (response.ok) {
+              loadDocuments();
+              docxFileInput.value = '';
+              dropZone.textContent = 'Перетащите файлы .DOCX сюда или нажмите для выбора';
+          } else {
+              alert('Ошибка при загрузке файла');
+          }
+      } else {
+          alert('Пожалуйста, выберите файл для загрузки');
+      }
+  });
+
+  function handleFile(file) {
+      if (file.name.endsWith('.docx')) {
+          dropZone.textContent = file.name;
+      } else {
+          showErrorBanner();
+          docxFileInput.value = '';
+          dropZone.textContent = 'Перетащите файлы .DOCX сюда или нажмите для выбора';
+      }
   }
+
+  function showErrorBanner() {
+      const banner = document.getElementById('errorBanner');
+      banner.style.display = 'block';
+      banner.style.opacity = '1';
+      setTimeout(() => {
+          banner.style.opacity = '0';
+          setTimeout(() => {
+              banner.style.display = 'none';
+          }, 1000); // Время затухания должно совпадать с transition в CSS
+      }, 2000); // Время показа баннера перед началом затухания
+  }
+
+  window.loadDocuments = async function() {
+      const response = await fetch('/document-management/documents');
+      if (response.ok) {
+          const documents = await response.json();
+          const documentList = document.getElementById('documentList');
+          documentList.innerHTML = '';
+          documents.forEach(doc => {
+              const docCard = document.createElement('div');
+              docCard.className = 'document-card';
+              docCard.innerHTML = `
+                  <p class="document-filename">${doc.filename}</p>
+                  <button class="details-button" onclick="showDocumentDetails(${doc.id})">Подробнее</button>
+                  <button class="archive-button" onclick="archiveDocument(${doc.id})">В Архив</button>
+              `;
+              documentList.appendChild(docCard);
+          });
+      } else {
+          alert('Ошибка при загрузке списка документов');
+      }
+  };
 
   loadDocuments();
 });
 
 async function archiveDocument(id) {
-  const response = await fetch(`/document-management/archive/${id}`, { method: 'POST' });
+  const response = await fetch(`/document-management/archive/${id}`, {
+      method: 'POST'
+  });
   if (response.ok) {
-    loadDocuments(); // Вызов глобальной функции
+      loadDocuments();
   } else {
-    alert('Ошибка при перемещении документа в архив');
+      alert('Ошибка при перемещении документа в архив');
   }
 }
 
 async function showDocumentDetails(id) {
   const response = await fetch(`/document-management/documents/${id}`);
   if (response.ok) {
-    const documentData = await response.json();
-    document.getElementById('documentTitle').textContent = documentData.title;
-    document.getElementById('documentProperties').innerHTML = formatMetadata(JSON.parse(documentData.properties));
-    document.getElementById('documentMetadata').innerHTML = formatMetadata(JSON.parse(documentData.metadata));
-    document.getElementById('documentContent').textContent = documentData.content;
-    document.getElementById('documentModal').style.display = 'block';
+      const documentData = await response.json();
+      document.getElementById('documentTitle').textContent = documentData.title;
+      document.getElementById('documentProperties').innerHTML = formatMetadata(JSON.parse(documentData.properties));
+      document.getElementById('documentMetadata').innerHTML = formatMetadata(JSON.parse(documentData.metadata));
+      document.getElementById('documentContent').textContent = documentData.content;
+      document.getElementById('documentModal').style.display = 'block';
   } else {
-    alert('Ошибка при получении информации о документе');
+      alert('Ошибка при получении информации о документе');
   }
 }
 
 function formatMetadata(metadata) {
   return Object.entries(metadata).map(([key, value]) => {
-    if (Array.isArray(value)) {
-      return `<li>${key}: [${value.join(', ')}]</li>`;
-    }
-    return `<li>${key}: ${value}</li>`;
+      if (Array.isArray(value)) {
+          return `<li>${key}: [${value.join(', ')}]</li>`;
+      }
+      return `<li>${key}: ${value}</li>`;
   }).join('');
 }
 
