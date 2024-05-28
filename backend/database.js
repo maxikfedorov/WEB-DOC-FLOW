@@ -1,7 +1,7 @@
-const path = require('path');
-const Database = require('better-sqlite3');
+const path = require("path");
+const Database = require("better-sqlite3");
 
-const db = new Database(path.join(__dirname, '..', 'db', 'database.db'));
+const db = new Database(path.join(__dirname, "..", "db", "database.db"));
 
 // Создание таблиц в базе данных, если они не существуют
 db.exec(`
@@ -51,8 +51,10 @@ db.exec(`
         properties TEXT,
         metadata TEXT,
         content TEXT,
-        data BLOB
-      );
+        data BLOB,
+        status TEXT DEFAULT 'Ожидание'
+    );
+
 `);
 
 module.exports = db;
