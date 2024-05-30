@@ -50,11 +50,14 @@
         <div class="modal-content">
             <span class="close" onclick="closeDocumentModal()">&times;</span>
             <h2 id="documentTitle"></h2>
+            <div id="commentsContainer">
+                <h3>Комментарии</h3>
+                <ul id="documentComments"></ul>
+            </div>
             <h3>Свойства документа</h3>
             <ul id="documentProperties"></ul>
             <h3>Метаданные документа</h3>
             <ul id="documentMetadata"></ul>
-            <!-- Добавьте это в модальное окно перед заголовком "Содержимое документа" -->
             <div id="signatureInfo">
                 <h3>Электронная подпись</h3>
                 <div id="signatureDetails" class="signature-details">
@@ -64,7 +67,6 @@
                     </div>
                 </div>
             </div>
-
             <h3>Содержимое документа</h3>
             <pre id="documentContent"></pre>
         </div>
@@ -95,6 +97,24 @@
             </form>
         </div>
     </div>
+
+    <!-- Модальное окно для отклонения документа -->
+    <div id="rejectModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeRejectModal()">&times;</span>
+            <h2>Отклонение документа</h2>
+            <form id="rejectForm">
+                <label for="rejectAuthor">Автор:</label>
+                <input type="text" id="rejectAuthor" name="author" required>
+                <label for="rejectComment">Комментарий:</label>
+                <textarea id="rejectComment" name="comment" required></textarea>
+                <button type="submit">Отклонить</button>
+                <button type="button" onclick="closeRejectModal()">Отмена</button>
+            </form>
+        </div>
+    </div>
+
+
 
 
 

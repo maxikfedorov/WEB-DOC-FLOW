@@ -83,6 +83,15 @@ router.get("/documents/:id", (req, res) => {
 	res.json(document);
 });
 
+router.get("/documents/:id/comments", (req, res) => {
+    const id = parseInt(req.params.id);
+    const stmt = db.prepare(`SELECT author, comment, commentDate FROM rejection_comments WHERE documentId = ?`);
+    const comments = stmt.all(id);
+    res.json(comments);
+});
+
+
+
 router.post("/archive/:id", (req, res) => {
 	const id = parseInt(req.params.id);
 	const stmt = db.prepare(`SELECT * FROM documents WHERE id = ?`);
@@ -163,11 +172,26 @@ router.get('/signatures/:id', (req, res) => {
 
 // Маршрут для отклонения документа
 router.post('/reject/:id', (req, res) => {
-  const id = parseInt(req.params.id);
-  const updateStmt = db.prepare(`UPDATE documents SET status = 'Отклонённый' WHERE id = ?`);
-  updateStmt.run(id);
-  res.sendStatus(200);
+    const id = parseInt(req.params.id);
+    const { author, comment } = req.body;
+
+    if (!author || !comment) {
+        return res.status(400).json({ error: "Автор и комментарий обязательны для заполнения" });
+    }
+
+    const updateStmt = db.prepare(`UPDATE documents SET status = 'Отклонённый' WHERE id = ?`);
+    updateStmt.run(id);
+
+    const insertCommentStmt = db.prepare(`
+        INSERT INTO rejection_comments (documentId, author, comment)
+        VALUES (?, ?, ?)
+    `);
+    insertCommentStmt.run(id, author, comment);
+
+    res.sendStatus(200);
 });
+
+
 
 // Маршрут для отзыва документа
 router.post('/revoke/:id', (req, res) => {
@@ -188,10 +212,22 @@ router.post('/review/:id', (req, res) => {
 // Маршрут для уничтожения документа
 router.post('/destroy/:id', (req, res) => {
   const id = parseInt(req.params.id);
+
+  // Удаление зависимых записей из таблицы rejection_comments
+  const deleteRejectionCommentsStmt = db.prepare(`DELETE FROM rejection_comments WHERE documentId = ?`);
+  deleteRejectionCommentsStmt.run(id);
+
+  // Удаление зависимых записей из таблицы comments
+  const deleteCommentsStmt = db.prepare(`DELETE FROM comments WHERE fileId = ?`);
+  deleteCommentsStmt.run(id);
+
+  // Удаление самого документа
   const deleteStmt = db.prepare(`DELETE FROM documents WHERE id = ?`);
   deleteStmt.run(id);
+
   res.sendStatus(200);
 });
+
 
 
 

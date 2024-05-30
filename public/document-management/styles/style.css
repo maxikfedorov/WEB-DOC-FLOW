@@ -100,14 +100,15 @@ button:hover {
     padding-top: 60px;
 }
 
+/* Общие стили для модального окна */
 .modal-content {
     background-color: #fefefe;
     margin: 5% auto;
     padding: 20px;
     border: 1px solid #888;
     width: 80%;
-    max-width: 500px;
-    text-align: center;
+    max-width: 600px; /* Увеличение максимальной ширины */
+    text-align: left; /* Выравнивание текста по левому краю */
     overflow: auto;
     max-height: 80vh;
 }
@@ -373,3 +374,118 @@ button:hover {
     margin: 5px 0; /* Отступы сверху и снизу */
 }
 
+/* Стили для контейнеров свойств и метаданных документа */
+#documentProperties, #documentMetadata {
+    background-color: #f9f9f9; /* Светлый фон для улучшения читаемости */
+    border: 1px solid #ccc; /* Тонкая граница */
+    border-radius: 5px; /* Скругленные углы */
+    padding: 10px; /* Внутренние отступы */
+    margin-bottom: 10px; /* Отступ снизу */
+    list-style-type: none; /* Убираем маркеры списка */
+}
+
+#documentProperties li, #documentMetadata li {
+    margin-bottom: 5px; /* Отступ между элементами списка */
+}
+
+/* Стили для основного контента документа */
+#documentContent {
+    background-color: #ffffff; /* Белый фон */
+    border: 1px solid #ccc; /* Тонкая граница */
+    border-radius: 5px; /* Скругленные углы */
+    padding: 15px; /* Внутренние отступы */
+    margin-top: 10px; /* Отступ сверху */
+    text-align: justify; /* Выравнивание текста по ширине */
+    max-height: 300px; /* Ограничение высоты */
+    overflow-y: auto; /* Прокрутка по вертикали */
+}
+
+
+/* Стили для блока комментариев */
+#commentsContainer {
+    background-color: #f5f5f5; /* Цвет фона, похожий на лист бумаги */
+    border: 2px solid #8B0000; /* Граница средней толщины тёмно-красного цвета */
+    border-radius: 10px; /* Скругленные края */
+    padding: 15px; /* Внутренние отступы */
+    margin-bottom: 20px; /* Отступ снизу */
+    color: #8B0000; /* Цвет текста тёмно-красного цвета */
+}
+
+#commentsContainer h3 {
+    text-align: center; /* Выровнять заголовок по центру */
+    font-weight: bold; /* Сделать текст жирным */
+}
+
+#commentsContainer ul {
+    list-style-type: none; /* Убираем маркеры списка */
+    padding: 0; /* Убираем отступы */
+}
+
+#commentsContainer li {
+    margin-bottom: 5px; /* Отступ между элементами списка */
+}
+
+/* Стили для модального окна отклонения документа */
+#rejectModal .modal-content {
+    background-color: #fefefe;
+    margin: 5% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 500px;
+    text-align: left;
+    overflow: auto;
+    max-height: 80vh;
+    border-radius: 10px; /* Скругленные углы */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Тень для объема */
+}
+
+#rejectModal label {
+    display: block;
+    margin-top: 10px;
+    font-weight: bold; /* Жирный шрифт для меток */
+}
+
+#rejectModal input[type="text"],
+#rejectModal textarea {
+    display: block;
+    margin-top: 5px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    width: 100%;
+    box-sizing: border-box;
+    border-radius: 5px; /* Скругленные углы */
+    font-size: 16px; /* Увеличенный размер шрифта */
+    max-width: 100%; /* Ограничение ширины */
+    min-width: 100%; /* Ограничение ширины */
+}
+
+#rejectModal button[type="submit"]{
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #dc3545; /* Красный цвет для кнопок */
+    color: white;
+    border: none;
+    border-radius: 5px; /* Скругленные углы */
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease; /* Плавный переход для анимации */
+}
+
+#rejectModal button[type="submit"]:hover {
+    background-color: #c82333; /* Темно-красный цвет при наведении */
+    transform: scale(1.05); /* Увеличение при наведении */
+}
+
+#rejectModal .close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+#rejectModal .close:hover,
+#rejectModal .close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}

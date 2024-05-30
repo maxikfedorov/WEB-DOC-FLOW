@@ -64,4 +64,16 @@ db.exec(`
     );
 `);
 
+db.exec(`
+    CREATE TABLE IF NOT EXISTS rejection_comments (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        documentId INTEGER,
+        author TEXT,
+        comment TEXT,
+        commentDate DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (documentId) REFERENCES documents(id)
+    );
+`);
+
+
 module.exports = db;

@@ -114,20 +114,44 @@ async function showDocumentDetails(id) {
         document.getElementById("documentMetadata").innerHTML = formatMetadata(JSON.parse(documentData.metadata));
         document.getElementById("documentContent").textContent = documentData.content;
 
+        // Очистка содержимого блока комментариев перед добавлением новой информации
+        const commentsContainer = document.getElementById("documentComments");
+        commentsContainer.innerHTML = "";
+
+        // Проверка статуса документа
+        const commentsWrapper = document.getElementById("commentsContainer");
+        if (documentData.status === "Ожидание" || documentData.status === "Подписанный") {
+            commentsWrapper.style.display = "none";
+        } else {
+            commentsWrapper.style.display = "block";
+            // Загрузка комментариев
+            const commentsResponse = await fetch(`/document-management/documents/${id}/comments`);
+            if (commentsResponse.ok) {
+                const comments = await commentsResponse.json();
+                comments.forEach(comment => {
+                    const commentItem = document.createElement("li");
+                    commentItem.innerHTML = `<strong>${comment.author}</strong> (${comment.commentDate}): ${comment.comment}`;
+                    commentsContainer.appendChild(commentItem);
+                });
+            } else {
+                commentsContainer.innerHTML = "<li>Ошибка при загрузке комментариев</li>";
+            }
+        }
+
         // Очистка содержимого блока подписи перед добавлением новой информации
         const signatureDetails = document.getElementById("signatureDetails");
-        signatureDetails.innerHTML = '';
+        signatureDetails.innerHTML = "";
 
-        const signatureTypeContainer = document.createElement('div');
-        signatureTypeContainer.className = 'signature-type-container';
+        const signatureTypeContainer = document.createElement("div");
+        signatureTypeContainer.className = "signature-type-container";
 
-        const signatureType = document.createElement('p');
-        signatureType.className = 'signature-type';
+        const signatureType = document.createElement("p");
+        signatureType.className = "signature-type";
 
-        const signatureLogo = document.createElement('img');
-        signatureLogo.src = '../media/MIREA_logo.png';
-        signatureLogo.alt = 'MIREA Logo';
-        signatureLogo.className = 'signature-logo';
+        const signatureLogo = document.createElement("img");
+        signatureLogo.src = "../media/MIREA_logo.png";
+        signatureLogo.alt = "MIREA Logo";
+        signatureLogo.className = "signature-logo";
 
         signatureTypeContainer.appendChild(signatureLogo);
         signatureTypeContainer.appendChild(signatureType);
@@ -171,6 +195,7 @@ async function showDocumentDetails(id) {
     }
 }
 
+
 function formatMetadata(metadata) {
 	return Object.entries(metadata)
 		.map(([key, value]) => {
@@ -182,8 +207,26 @@ function formatMetadata(metadata) {
 		.join("");
 }
 
+// Функция для закрытия модального окна при клике вне его области
+function closeModalOnClickOutside(event){
+	const modals = document.querySelectorAll(".modal");
+	modals.forEach((modal) => {
+		if (event.target === modal) {
+			modal.style.display = "none";
+		}
+	});
+}
+
+// Добавление обработчика событий для закрытия модальных окон при клике вне их области
+document.addEventListener("click", closeModalOnClickOutside);
+
+// Существующие функции для закрытия модальных окон по крестику
 function closeDocumentModal() {
 	document.getElementById("documentModal").style.display = "none";
+}
+
+function closeSignatureModal() {
+	document.getElementById("signatureModal").style.display = "none";
 }
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -265,6 +308,48 @@ async function revokeDocument(id) {
 	}
 }
 
+document.addEventListener("DOMContentLoaded", function () {
+    loadDocuments();
+    setupRejectForm();
+});
+
+function setupRejectForm() {
+    const rejectForm = document.getElementById("rejectForm");
+    rejectForm.onsubmit = async function (event) {
+        event.preventDefault();
+        const formData = new FormData(rejectForm);
+        const data = {
+            author: formData.get("author"),
+            comment: formData.get("comment")
+        };
+        const documentId = rejectForm.dataset.documentId;
+
+        const response = await fetch(`/document-management/reject/${documentId}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data)
+        });
+
+        if (response.ok) {
+            loadDocuments();
+            closeRejectModal();
+        } else {
+            alert("Ошибка при отклонении документа");
+        }
+    };
+}
+
+function openRejectModal(documentId) {
+    const rejectForm = document.getElementById("rejectForm");
+    rejectForm.dataset.documentId = documentId;
+    document.getElementById("rejectModal").style.display = "block";
+}
+
+function closeRejectModal() {
+    document.getElementById("rejectModal").style.display = "none";
+}
+
+
 async function reviewDocument(id) {
 	const response = await fetch(`/document-management/review/${id}`, {
 		method: "POST",
@@ -299,39 +384,40 @@ async function archiveDocument(id) {
 }
 
 function createDocumentCard(doc) {
-	const docCard = document.createElement("div");
-	docCard.className = "document-card";
-	docCard.innerHTML = `
+    const docCard = document.createElement("div");
+    docCard.className = "document-card";
+    docCard.innerHTML = `
         <p class="document-filename">${doc.filename}</p>
     `;
 
-	const buttonContainer = document.createElement("div");
-	buttonContainer.className = "button-container";
+    const buttonContainer = document.createElement("div");
+    buttonContainer.className = "button-container";
 
-	if (doc.status === "Ожидание") {
-		buttonContainer.innerHTML += `
+    if (doc.status === "Ожидание") {
+        buttonContainer.innerHTML += `
             <button class="sign-button" onclick="signDocument(${doc.id})">Подписать</button>
-            <button class="reject-button" onclick="rejectDocument(${doc.id})">Отклонить</button>
+            <button class="reject-button" onclick="openRejectModal(${doc.id})">Отклонить</button>
             <button class="details-button" onclick="showDocumentDetails(${doc.id})">Подробнее</button>
         `;
-	} else if (doc.status === "Подписанный") {
-		buttonContainer.innerHTML += `
+    } else if (doc.status === "Подписанный") {
+        buttonContainer.innerHTML += `
             <button class="approve-button" onclick="archiveDocument(${doc.id})">Утвердить</button>
             <button class="revoke-button" onclick="revokeDocument(${doc.id})">Отозвать</button>
             <button class="details-button" onclick="showDocumentDetails(${doc.id})">Подробнее</button>
         `;
-	} else if (doc.status === "Отклонённый") {
-		buttonContainer.innerHTML += `
+    } else if (doc.status === "Отклонённый") {
+        buttonContainer.innerHTML += `
             <button class="review-button" onclick="reviewDocument(${doc.id})">Пересмотреть</button>
             <button class="details-button" onclick="showDocumentDetails(${doc.id})">Подробнее</button>
             <button class="archive-button" onclick="archiveDocument(${doc.id})">В Архив</button>
             <button class="destroy-button" onclick="destroyDocument(${doc.id})">Уничтожить</button>
         `;
-	}
+    }
 
-	docCard.appendChild(buttonContainer);
-	return docCard;
+    docCard.appendChild(buttonContainer);
+    return docCard;
 }
+
 
 async function updateDocumentStatus(id, newStatus) {
 	const response = await fetch(`/document-management/update-status/${id}`, {
