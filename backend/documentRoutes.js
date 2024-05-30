@@ -90,47 +90,64 @@ router.get("/documents/:id/comments", (req, res) => {
     res.json(comments);
 });
 
-
-
 router.post("/archive/:id", (req, res) => {
-	const id = parseInt(req.params.id);
-	const stmt = db.prepare(`SELECT * FROM documents WHERE id = ?`);
-	const document = stmt.get(id);
+    const id = parseInt(req.params.id);
+    const stmt = db.prepare(`SELECT * FROM documents WHERE id = ?`);
+    const document = stmt.get(id);
 
-	if (!document) {
-		return res.status(404).send("Документ не найден");
-	}
+    if (!document) {
+        return res.status(404).send("Документ не найден");
+    }
 
-	const insertStmt = db.prepare(`
-      INSERT INTO files (author, filename, uploadDate, modifyDate, extension, size, state, relatedFiles, data)
-      VALUES (?, ?, datetime('now'), datetime('now'), ?, ?, 'Current', ?, ?)
+    const insertStmt = db.prepare(`
+        INSERT INTO files (author, filename, uploadDate, modifyDate, extension, size, state, relatedFiles, data)
+        VALUES (?, ?, datetime('now'), datetime('now'), ?, ?, 'Current', ?, ?)
     `);
-	const info = insertStmt.run(
-		"system", // author
-		document.filename,
-		path.extname(document.filename),
-		Buffer.byteLength(document.content, "utf-8") / 1024, // size in KB
-		JSON.stringify([]), // relatedFiles
-		document.data,
-	);
+    const info = insertStmt.run(
+        "system", // author
+        document.filename,
+        path.extname(document.filename),
+        Buffer.byteLength(document.content, "utf-8") / 1024, // size in KB
+        JSON.stringify([]), // relatedFiles
+        document.data,
+    );
 
-	const deleteStmt = db.prepare(`DELETE FROM documents WHERE id = ?`);
-	deleteStmt.run(id);
+    // Копирование комментариев из rejection_comments в comments
+    const selectCommentsStmt = db.prepare(`SELECT * FROM rejection_comments WHERE documentId = ?`);
+    const comments = selectCommentsStmt.all(id);
 
-	// Запись в историю изменений
-	const historyStmt = db.prepare(`
-      INSERT INTO history (fileId, filename, author, changeDate, changeText)
-      VALUES (?, ?, ?, datetime('now'), ?)
+    const insertCommentStmt = db.prepare(`
+        INSERT INTO comments (fileId, author, comment, commentDate)
+        VALUES (?, ?, ?, ?)
     `);
-	historyStmt.run(
-		info.lastInsertRowid,
-		document.filename,
-		"system",
-		"Файл вышел из оборота",
-	);
 
-	res.sendStatus(200);
+    comments.forEach(comment => {
+        insertCommentStmt.run(info.lastInsertRowid, comment.author, comment.comment, comment.commentDate);
+    });
+
+    // Удаление комментариев из rejection_comments
+    const deleteRejectionCommentsStmt = db.prepare(`DELETE FROM rejection_comments WHERE documentId = ?`);
+    deleteRejectionCommentsStmt.run(id);
+
+    // Удаление самого документа
+    const deleteStmt = db.prepare(`DELETE FROM documents WHERE id = ?`);
+    deleteStmt.run(id);
+
+    // Запись в историю изменений
+    const historyStmt = db.prepare(`
+        INSERT INTO history (fileId, filename, author, changeDate, changeText)
+        VALUES (?, ?, ?, datetime('now'), ?)
+    `);
+    historyStmt.run(
+        info.lastInsertRowid,
+        document.filename,
+        "system",
+        "Файл вышел из оборота",
+    );
+
+    res.sendStatus(200);
 });
+
 
 // Маршрут для изменения статуса документа
 router.post('/update-status/:id', (req, res) => {
