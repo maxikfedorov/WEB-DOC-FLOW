@@ -106,95 +106,113 @@ async function archiveDocument(id) {
 }
 
 async function showDocumentDetails(id) {
-    const response = await fetch(`/document-management/documents/${id}`);
-    if (response.ok) {
-        const documentData = await response.json();
-        document.getElementById("documentTitle").textContent = documentData.title;
-        document.getElementById("documentProperties").innerHTML = formatMetadata(JSON.parse(documentData.properties));
-        document.getElementById("documentMetadata").innerHTML = formatMetadata(JSON.parse(documentData.metadata));
-        document.getElementById("documentContent").textContent = documentData.content;
+	const response = await fetch(`/document-management/documents/${id}`);
+	if (response.ok) {
+		const documentData = await response.json();
+		document.getElementById("documentTitle").textContent =
+			documentData.title;
+		document.getElementById("documentModal").dataset.documentId = id;
+		document.getElementById("documentProperties").innerHTML =
+			formatMetadata(JSON.parse(documentData.properties));
+		document.getElementById("documentMetadata").innerHTML = formatMetadata(
+			JSON.parse(documentData.metadata),
+		);
+		document.getElementById("documentContent").textContent =
+			documentData.content;
 
-        // Очистка содержимого блока комментариев перед добавлением новой информации
-        const commentsContainer = document.getElementById("documentComments");
-        commentsContainer.innerHTML = "";
+		// Очистка содержимого блока комментариев перед добавлением новой информации
+		const commentsContainer = document.getElementById("documentComments");
+		commentsContainer.innerHTML = "";
 
-        // Проверка статуса документа
-        const commentsWrapper = document.getElementById("commentsContainer");
-        if (documentData.status === "Ожидание" || documentData.status === "Подписанный") {
-            commentsWrapper.style.display = "none";
-        } else {
-            commentsWrapper.style.display = "block";
-            // Загрузка комментариев
-            const commentsResponse = await fetch(`/document-management/documents/${id}/comments`);
-            if (commentsResponse.ok) {
-                const comments = await commentsResponse.json();
-                comments.forEach(comment => {
-                    const commentItem = document.createElement("li");
-                    commentItem.innerHTML = `<strong>${comment.author}</strong> (${comment.commentDate}): ${comment.comment}`;
-                    commentsContainer.appendChild(commentItem);
-                });
-            } else {
-                commentsContainer.innerHTML = "<li>Ошибка при загрузке комментариев</li>";
-            }
-        }
+		// Проверка статуса документа
+		const commentsWrapper = document.getElementById("commentsContainer");
+		if (
+			documentData.status === "Ожидание" ||
+			documentData.status === "Подписанный"
+		) {
+			commentsWrapper.style.display = "none";
+		} else {
+			commentsWrapper.style.display = "block";
+			// Загрузка комментариев
+			const commentsResponse = await fetch(
+				`/document-management/documents/${id}/comments`,
+			);
+			if (commentsResponse.ok) {
+				const comments = await commentsResponse.json();
+				comments.forEach((comment) => {
+					const commentItem = document.createElement("li");
+					commentItem.innerHTML = `<strong>${comment.author}</strong> (${comment.commentDate}): ${comment.comment}`;
+					commentsContainer.appendChild(commentItem);
+				});
+			} else {
+				commentsContainer.innerHTML =
+					"<li>Ошибка при загрузке комментариев</li>";
+			}
+		}
 
-        // Очистка содержимого блока подписи перед добавлением новой информации
-        const signatureDetails = document.getElementById("signatureDetails");
-        signatureDetails.innerHTML = "";
+		// Очистка содержимого блока подписи перед добавлением новой информации
+		const signatureDetails = document.getElementById("signatureDetails");
+		signatureDetails.innerHTML = "";
 
-        const signatureTypeContainer = document.createElement("div");
-        signatureTypeContainer.className = "signature-type-container";
+		const signatureTypeContainer = document.createElement("div");
+		signatureTypeContainer.className = "signature-type-container";
 
-        const signatureType = document.createElement("p");
-        signatureType.className = "signature-type";
+		const signatureType = document.createElement("p");
+		signatureType.className = "signature-type";
 
-        const signatureLogo = document.createElement("img");
-        signatureLogo.src = "../media/MIREA_logo.png";
-        signatureLogo.alt = "MIREA Logo";
-        signatureLogo.className = "signature-logo";
+		const signatureLogo = document.createElement("img");
+		signatureLogo.src = "../media/MIREA_logo.png";
+		signatureLogo.alt = "MIREA Logo";
+		signatureLogo.className = "signature-logo";
 
-        signatureTypeContainer.appendChild(signatureLogo);
-        signatureTypeContainer.appendChild(signatureType);
-        signatureDetails.appendChild(signatureTypeContainer);
+		signatureTypeContainer.appendChild(signatureLogo);
+		signatureTypeContainer.appendChild(signatureType);
+		signatureDetails.appendChild(signatureTypeContainer);
 
-        if (documentData.signatureId) {
-            const signatureResponse = await fetch(`/document-management/signatures/${documentData.signatureId}`);
-            if (signatureResponse.ok) {
-                const signatureData = await signatureResponse.json();
-                let signatureTypeText;
-                switch (signatureData.type) {
-                    case "ПЭП":
-                        signatureTypeText = "ДОКУМЕНТ ПОДПИСАН ПРОСТОЙ ЭЛЕКТРОННОЙ ПОДПИСЬЮ";
-                        break;
-                    case "УНЭП":
-                        signatureTypeText = "ДОКУМЕНТ ПОДПИСАН УСИЛЕННОЙ НЕКВАЛИФИЦИРОВАННОЙ ЭЛЕКТРОННОЙ ПОДПИСЬЮ";
-                        break;
-                    case "УКЭП":
-                        signatureTypeText = "ДОКУМЕНТ ПОДПИСАН УСИЛЕННОЙ КВАЛИФИЦИРОВАННОЙ ЭЛЕКТРОННОЙ ПОДПИСЬЮ";
-                        break;
-                    default:
-                        signatureTypeText = "ДОКУМЕНТ ПОДПИСАН НЕИЗВЕСТНОЙ ПОДПИСЬЮ";
-                }
-                signatureType.innerHTML = `<strong>${signatureTypeText}</strong>`;
-                signatureDetails.innerHTML += `
+		if (documentData.signatureId) {
+			const signatureResponse = await fetch(
+				`/document-management/signatures/${documentData.signatureId}`,
+			);
+			if (signatureResponse.ok) {
+				const signatureData = await signatureResponse.json();
+				let signatureTypeText;
+				switch (signatureData.type) {
+					case "ПЭП":
+						signatureTypeText =
+							"ДОКУМЕНТ ПОДПИСАН ПРОСТОЙ ЭЛЕКТРОННОЙ ПОДПИСЬЮ";
+						break;
+					case "УНЭП":
+						signatureTypeText =
+							"ДОКУМЕНТ ПОДПИСАН УСИЛЕННОЙ НЕКВАЛИФИЦИРОВАННОЙ ЭЛЕКТРОННОЙ ПОДПИСЬЮ";
+						break;
+					case "УКЭП":
+						signatureTypeText =
+							"ДОКУМЕНТ ПОДПИСАН УСИЛЕННОЙ КВАЛИФИЦИРОВАННОЙ ЭЛЕКТРОННОЙ ПОДПИСЬЮ";
+						break;
+					default:
+						signatureTypeText =
+							"ДОКУМЕНТ ПОДПИСАН НЕИЗВЕСТНОЙ ПОДПИСЬЮ";
+				}
+				signatureType.innerHTML = `<strong>${signatureTypeText}</strong>`;
+				signatureDetails.innerHTML += `
                     <p><strong>Номер сертификата:</strong> ${signatureData.certificateNumber}</p>
                     <p><strong>Владелец:</strong> ${signatureData.owner}</p>
                     <p><strong>Действителен с:</strong> ${signatureData.validFrom}</p>
                     <p><strong>по:</strong> ${signatureData.validTo}</p>
                 `;
-            } else {
-                signatureType.textContent = "Ошибка при загрузке данных подписи";
-            }
-        } else {
-            signatureType.textContent = "Не подписано";
-        }
+			} else {
+				signatureType.textContent =
+					"Ошибка при загрузке данных подписи";
+			}
+		} else {
+			signatureType.textContent = "Не подписано";
+		}
 
-        document.getElementById("documentModal").style.display = "block";
-    } else {
-        alert("Ошибка при получении информации о документе");
-    }
+		document.getElementById("documentModal").style.display = "block";
+	} else {
+		alert("Ошибка при получении информации о документе");
+	}
 }
-
 
 function formatMetadata(metadata) {
 	return Object.entries(metadata)
@@ -208,7 +226,7 @@ function formatMetadata(metadata) {
 }
 
 // Функция для закрытия модального окна при клике вне его области
-function closeModalOnClickOutside(event){
+function closeModalOnClickOutside(event) {
 	const modals = document.querySelectorAll(".modal");
 	modals.forEach((modal) => {
 		if (event.target === modal) {
@@ -309,46 +327,48 @@ async function revokeDocument(id) {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-    loadDocuments();
-    setupRejectForm();
+	loadDocuments();
+	setupRejectForm();
 });
 
 function setupRejectForm() {
-    const rejectForm = document.getElementById("rejectForm");
-    rejectForm.onsubmit = async function (event) {
-        event.preventDefault();
-        const formData = new FormData(rejectForm);
-        const data = {
-            author: formData.get("author"),
-            comment: formData.get("comment")
-        };
-        const documentId = rejectForm.dataset.documentId;
+	const rejectForm = document.getElementById("rejectForm");
+	rejectForm.onsubmit = async function (event) {
+		event.preventDefault();
+		const formData = new FormData(rejectForm);
+		const data = {
+			author: formData.get("author"),
+			comment: formData.get("comment"),
+		};
+		const documentId = rejectForm.dataset.documentId;
 
-        const response = await fetch(`/document-management/reject/${documentId}`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data)
-        });
+		const response = await fetch(
+			`/document-management/reject/${documentId}`,
+			{
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(data),
+			},
+		);
 
-        if (response.ok) {
-            loadDocuments();
-            closeRejectModal();
-        } else {
-            alert("Ошибка при отклонении документа");
-        }
-    };
+		if (response.ok) {
+			loadDocuments();
+			closeRejectModal();
+		} else {
+			alert("Ошибка при отклонении документа");
+		}
+	};
 }
 
 function openRejectModal(documentId) {
-    const rejectForm = document.getElementById("rejectForm");
-    rejectForm.dataset.documentId = documentId;
-    document.getElementById("rejectModal").style.display = "block";
+	const rejectForm = document.getElementById("rejectForm");
+	rejectForm.dataset.documentId = documentId;
+	document.getElementById("rejectModal").style.display = "block";
 }
 
 function closeRejectModal() {
-    document.getElementById("rejectModal").style.display = "none";
+	document.getElementById("rejectModal").style.display = "none";
 }
-
 
 async function reviewDocument(id) {
 	const response = await fetch(`/document-management/review/${id}`, {
@@ -384,40 +404,77 @@ async function archiveDocument(id) {
 }
 
 function createDocumentCard(doc) {
-    const docCard = document.createElement("div");
-    docCard.className = "document-card";
-    docCard.innerHTML = `
+	const docCard = document.createElement("div");
+	docCard.className = "document-card";
+	docCard.innerHTML = `
         <p class="document-filename">${doc.filename}</p>
     `;
 
-    const buttonContainer = document.createElement("div");
-    buttonContainer.className = "button-container";
+	const buttonContainer = document.createElement("div");
+	buttonContainer.className = "button-container";
 
-    if (doc.status === "Ожидание") {
-        buttonContainer.innerHTML += `
+	if (doc.status === "Ожидание") {
+		buttonContainer.innerHTML += `
             <button class="sign-button" onclick="signDocument(${doc.id})">Подписать</button>
             <button class="reject-button" onclick="openRejectModal(${doc.id})">Отклонить</button>
             <button class="details-button" onclick="showDocumentDetails(${doc.id})">Подробнее</button>
         `;
-    } else if (doc.status === "Подписанный") {
-        buttonContainer.innerHTML += `
+	} else if (doc.status === "Подписанный") {
+		buttonContainer.innerHTML += `
             <button class="approve-button" onclick="archiveDocument(${doc.id})">Утвердить</button>
             <button class="revoke-button" onclick="revokeDocument(${doc.id})">Отозвать</button>
             <button class="details-button" onclick="showDocumentDetails(${doc.id})">Подробнее</button>
         `;
-    } else if (doc.status === "Отклонённый") {
-        buttonContainer.innerHTML += `
+	} else if (doc.status === "Отклонённый") {
+		buttonContainer.innerHTML += `
             <button class="review-button" onclick="reviewDocument(${doc.id})">Пересмотреть</button>
             <button class="details-button" onclick="showDocumentDetails(${doc.id})">Подробнее</button>
             <button class="archive-button" onclick="archiveDocument(${doc.id})">В Архив</button>
             <button class="destroy-button" onclick="destroyDocument(${doc.id})">Уничтожить</button>
         `;
-    }
+	}
 
-    docCard.appendChild(buttonContainer);
-    return docCard;
+	docCard.appendChild(buttonContainer);
+	return docCard;
 }
 
+// Функция для начала редактирования заголовка документа
+function editDocumentTitle() {
+	const documentTitle = document.getElementById("documentTitle").textContent;
+	document.getElementById("newDocumentTitle").value = documentTitle;
+	document.getElementById("documentTitleContainer").style.display = "none";
+	document.getElementById("editTitleContainer").style.display = "flex";
+}
+
+// Функция для подтверждения изменения заголовка документа
+async function confirmEditTitle() {
+	const newTitle = document.getElementById("newDocumentTitle").value;
+	const documentId =
+		document.getElementById("documentModal").dataset.documentId;
+
+	// Обновление заголовка в базе данных
+	const response = await fetch(
+		`/document-management/update-title/${documentId}`,
+		{
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ title: newTitle }),
+		},
+	);
+
+	if (response.ok) {
+		document.getElementById("documentTitle").textContent = newTitle;
+		cancelEditTitle();
+	} else {
+		alert("Ошибка при обновлении заголовка документа");
+	}
+}
+
+// Функция для отмены редактирования заголовка документа
+function cancelEditTitle() {
+	document.getElementById("documentTitleContainer").style.display = "flex";
+	document.getElementById("editTitleContainer").style.display = "none";
+}
 
 async function updateDocumentStatus(id, newStatus) {
 	const response = await fetch(`/document-management/update-status/${id}`, {

@@ -229,6 +229,16 @@ router.post('/destroy/:id', (req, res) => {
 });
 
 
+// Маршрут для обновления заголовка документа
+router.post('/update-title/:id', (req, res) => {
+    const id = parseInt(req.params.id);
+    const newTitle = req.body.title;
+
+    const updateStmt = db.prepare(`UPDATE documents SET title = ? WHERE id = ?`);
+    updateStmt.run(newTitle, id);
+
+    res.sendStatus(200);
+});
 
 
 

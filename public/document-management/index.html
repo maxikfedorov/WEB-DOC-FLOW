@@ -49,7 +49,15 @@
     <div id="documentModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeDocumentModal()">&times;</span>
-            <h2 id="documentTitle"></h2>
+            <div id="documentTitleContainer">
+                <h2 id="documentTitle"></h2>
+                <button id="editTitleButton" onclick="editDocumentTitle()">Изменить</button>
+            </div>
+            <div id="editTitleContainer" style="display: none;">
+                <input type="text" id="newDocumentTitle" />
+                <button id="confirmEditTitleButton" onclick="confirmEditTitle()">Подтвердить</button>
+                <button id="cancelEditTitleButton" onclick="cancelEditTitle()">Отменить</button>
+            </div>
             <div id="commentsContainer">
                 <h3>Комментарии</h3>
                 <ul id="documentComments"></ul>
@@ -71,6 +79,7 @@
             <pre id="documentContent"></pre>
         </div>
     </div>
+
 
     <!-- Добавьте это в модальное окно для ввода данных электронной подписи -->
     <div id="signatureModal" class="modal">
