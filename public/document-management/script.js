@@ -269,35 +269,43 @@ async function loadDocumentsByStatus(status, containerId) {
 }
 
 async function signDocument(id) {
-	const signatureModal = document.getElementById("signatureModal");
-	const signatureForm = document.getElementById("signatureForm");
+    const signatureModal = document.getElementById("signatureModal");
+    const signatureForm = document.getElementById("signatureForm");
 
-	signatureForm.onsubmit = async function (event) {
-		event.preventDefault();
-		const formData = new FormData(signatureForm);
-		const data = {
-			certificateNumber: formData.get("certificateNumber"),
-			owner: formData.get("owner"),
-			validFrom: formData.get("validFrom"),
-			validTo: formData.get("validTo"),
-			type: formData.get("type"),
-		};
+    signatureForm.onsubmit = async function (event) {
+        event.preventDefault();
+        const formData = new FormData(signatureForm);
+        const data = {
+            certificateNumber: formData.get("certificateNumber"),
+            owner: formData.get("owner"),
+            validFrom: formData.get("validFrom"),
+            validTo: formData.get("validTo"),
+            type: formData.get("type"),
+        };
 
-		const response = await fetch(`/document-management/sign/${id}`, {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify(data),
-		});
+        const response = await fetch(`/document-management/sign/${id}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
+        });
 
-		if (response.ok) {
-			loadDocuments();
-			closeSignatureModal();
-		} else {
-			alert("Ошибка при подписании документа");
-		}
-	};
+        if (response.ok) {
+            loadDocuments();
+            closeSignatureModal();
+        } else {
+            alert("Ошибка при подписании документа");
+        }
+    };
 
-	signatureModal.style.display = "block";
+    // Добавляем обработчик события для клавиши Enter
+    signatureForm.addEventListener("keydown", function (event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            signatureForm.onsubmit(event);
+        }
+    });
+
+    signatureModal.style.display = "block";
 }
 
 function closeSignatureModal() {
@@ -332,32 +340,40 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 function setupRejectForm() {
-	const rejectForm = document.getElementById("rejectForm");
-	rejectForm.onsubmit = async function (event) {
-		event.preventDefault();
-		const formData = new FormData(rejectForm);
-		const data = {
-			author: formData.get("author"),
-			comment: formData.get("comment"),
-		};
-		const documentId = rejectForm.dataset.documentId;
+    const rejectForm = document.getElementById("rejectForm");
+    rejectForm.onsubmit = async function (event) {
+        event.preventDefault();
+        const formData = new FormData(rejectForm);
+        const data = {
+            author: formData.get("author"),
+            comment: formData.get("comment"),
+        };
+        const documentId = rejectForm.dataset.documentId;
 
-		const response = await fetch(
-			`/document-management/reject/${documentId}`,
-			{
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify(data),
-			},
-		);
+        const response = await fetch(
+            `/document-management/reject/${documentId}`,
+            {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data),
+            },
+        );
 
-		if (response.ok) {
-			loadDocuments();
-			closeRejectModal();
-		} else {
-			alert("Ошибка при отклонении документа");
-		}
-	};
+        if (response.ok) {
+            loadDocuments();
+            closeRejectModal();
+        } else {
+            alert("Ошибка при отклонении документа");
+        }
+    };
+
+    // Добавляем обработчик события для клавиши Enter
+    rejectForm.addEventListener("keydown", function (event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            rejectForm.onsubmit(event);
+        }
+    });
 }
 
 function openRejectModal(documentId) {
@@ -448,27 +464,35 @@ function editDocumentTitle() {
 
 // Функция для подтверждения изменения заголовка документа
 async function confirmEditTitle() {
-	const newTitle = document.getElementById("newDocumentTitle").value;
-	const documentId =
-		document.getElementById("documentModal").dataset.documentId;
+    const newTitle = document.getElementById("newDocumentTitle").value;
+    const documentId =
+        document.getElementById("documentModal").dataset.documentId;
 
-	// Обновление заголовка в базе данных
-	const response = await fetch(
-		`/document-management/update-title/${documentId}`,
-		{
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({ title: newTitle }),
-		},
-	);
+    // Обновление заголовка в базе данных
+    const response = await fetch(
+        `/document-management/update-title/${documentId}`,
+        {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ title: newTitle }),
+        },
+    );
 
-	if (response.ok) {
-		document.getElementById("documentTitle").textContent = newTitle;
-		cancelEditTitle();
-	} else {
-		alert("Ошибка при обновлении заголовка документа");
-	}
+    if (response.ok) {
+        document.getElementById("documentTitle").textContent = newTitle;
+        cancelEditTitle();
+    } else {
+        alert("Ошибка при обновлении заголовка документа");
+    }
 }
+
+// Добавляем обработчик события для клавиши Enter
+document.getElementById("newDocumentTitle").addEventListener("keydown", function (event) {
+    if (event.key === "Enter") {
+        event.preventDefault();
+        confirmEditTitle();
+    }
+});
 
 // Функция для отмены редактирования заголовка документа
 function cancelEditTitle() {
