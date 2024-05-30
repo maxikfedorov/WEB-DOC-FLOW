@@ -13,6 +13,10 @@
 - **Управление комментариями**: Добавление и просмотр комментариев к файлам.
 - **История изменений**: Просмотр и очистка истории изменений файлов.
 - **Фильтрация и сортировка**: Фильтрация и сортировка файлов по различным параметрам.
+- **Управление .DOCX документами**: Загрузка, просмотр, редактирование и удаление документов.
+- **Электронная подпись**: Подписание документов с использованием различных типов электронных подписей.
+- **Отклонение и пересмотр документов**: Возможность отклонения документов с добавлением комментариев и последующего пересмотра.
+
 
 ### Установка
 
@@ -67,20 +71,36 @@
 ### Структура проекта
 
 ```plaintext
-├── .gitignore
+WEB-DOC-FLOW/
+├── backend/
+│   ├── archiveRoutes.js
+│   ├── database.js
+│   ├── documentRoutes.js
+│   └── server.js
+├── db/
+│   └── database.db
+├── public/
+│   ├── archive/
+│   │   ├── index.html
+│   │   ├── script.js
+│   │   └── styles/
+│   │       ├── style-brutal.css
+│   │       └── style.css
+│   ├── document-management/
+│   │   ├── index.html
+│   │   ├── script.js
+│   │   └── styles/
+│   │       └── style.css
+│   ├── fonts/
+│   │   ├── Code New Roman b.otf
+│   │   ├── Code New Roman i.otf
+│   │   └── Code New Roman.otf
+│   └── media/
+│       ├── favicon.ico
+│       └── MIREA_logo.png
+├── jsconfig.json
 ├── package.json
-├── README.md
-├── server.js
-├── db
-│   └── archive.db
-├── public
-│   ├── index.html
-│   ├── script.js
-│   ├── style-brutal.css
-│   ├── style.css
-│   ├── fonts
-│   └── media
-│       └── favicon.ico
+└── README.md
 
 ```
 
