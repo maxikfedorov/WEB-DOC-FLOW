@@ -103,6 +103,7 @@ router.post("/archive/:id", (req, res) => {
         INSERT INTO files (author, filename, uploadDate, modifyDate, extension, size, state, relatedFiles, data)
         VALUES (?, ?, datetime('now'), datetime('now'), ?, ?, 'Current', ?, ?)
     `);
+
     const info = insertStmt.run(
         "system", // author
         document.filename,
@@ -147,7 +148,6 @@ router.post("/archive/:id", (req, res) => {
 
     res.sendStatus(200);
 });
-
 
 // Маршрут для изменения статуса документа
 router.post('/update-status/:id', (req, res) => {

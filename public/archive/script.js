@@ -596,7 +596,6 @@ document.getElementById('commentForm').addEventListener('submit', async function
     }
 });
 
-
 // Установка дефолтного значения флажка "сетка" на неактивное при перезагрузке страницы
 window.onload = function() {
     document.getElementById('viewToggle').checked = false;

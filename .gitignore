@@ -1,3 +1,6 @@
+db/database.db
+database.db
+
 # Logs
 logs
 *.log
@@ -136,4 +139,4 @@ CodeSum.py
 Код проекта WEB-DOC-FLOW.txt
 .vscode/settings.json
 database.db
-db/database.db
+

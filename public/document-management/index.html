@@ -12,36 +12,37 @@
 </head>
 
 <body>
-    <header>
-        <h1 id="pageTitle">СИСТЕМА ДОКУМЕНТООБОРОТА</h1>
-    </header>
+    <div id="mainContainer">
+        <header>
+            <h1 id="pageTitle">СИСТЕМА ДОКУМЕНТООБОРОТА</h1>
+        </header>
 
-
-    <div id="content">
-        <form id="uploadForm" enctype="multipart/form-data" action="/document-management/upload" method="post">
-            <!-- <label for="username">Имя пользователя:</label>
-        <input type="text" id="username" name="username" placeholder="Введите имя пользователя"> -->
-            <!-- <br> -->
-            <div id="dropZone" class="drop-zone">
-                Перетащите файлы .DOCX сюда или нажмите для выбора
-            </div>
-            <button type="submit">Загрузить</button>
-        </form>
         <div id="content">
-            <section id="pendingSection">
-                <h2>Ожидают проверки</h2>
-                <div id="pendingDocuments"></div>
-            </section>
-            <hr>
-            <section id="approvedSection">
-                <h2>Подписанные</h2>
-                <div id="approvedDocuments"></div>
-            </section>
-            <hr>
-            <section id="rejectedSection">
-                <h2>Отклонённые</h2>
-                <div id="rejectedDocuments"></div>
-            </section>
+            <form id="uploadForm" enctype="multipart/form-data" action="/document-management/upload" method="post">
+                <!-- <label for="username">Имя пользователя:</label>
+            <input type="text" id="username" name="username" placeholder="Введите имя пользователя"> -->
+                <!-- <br> -->
+                <div id="dropZone" class="drop-zone">
+                    Перетащите файлы .DOCX сюда или нажмите для выбора
+                </div>
+                <button type="submit">Загрузить</button>
+            </form>
+            <div id="content">
+                <section id="pendingSection">
+                    <h2>Ожидают проверки</h2>
+                    <div id="pendingDocuments"></div>
+                </section>
+                <hr>
+                <section id="approvedSection">
+                    <h2>Подписанные</h2>
+                    <div id="approvedDocuments"></div>
+                </section>
+                <hr>
+                <section id="rejectedSection">
+                    <h2>Отклонённые</h2>
+                    <div id="rejectedDocuments"></div>
+                </section>
+            </div>
         </div>
     </div>
 
@@ -79,7 +80,6 @@
             <pre id="documentContent"></pre>
         </div>
     </div>
-
 
     <!-- Добавьте это в модальное окно для ввода данных электронной подписи -->
     <div id="signatureModal" class="modal">
@@ -123,11 +123,20 @@
         </div>
     </div>
 
-
-
-
-
     <div id="errorBanner">Ошибка: можно загружать только файлы с расширением .docx</div>
+
+    <footer>
+        <div class="footer-content">
+            <img src="../media/MIREA_logo.png" alt="MIREA Logo" class="footer-logo">
+            <div class="footer-text">
+                <h3>Система Управления Документами</h3>
+                <p>Версия проекта: 1.0.0</p>
+                <p>Федоров М.А., Матчин В.Т.</p>
+                <p>Институт информационных технологий, кафедра ИППО</p>
+                <p>© 2024 МИРЭА – Российский технологический университет</p>
+            </div>
+        </div>
+    </footer>
 
     <script src="script.js"></script>
 </body>
