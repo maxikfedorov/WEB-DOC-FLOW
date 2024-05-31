@@ -1,7 +1,10 @@
 async function loadDocuments() {
+	let loaderTimeout = setTimeout(showLoader, 2000); // Запуск анимации через 2 секунды
 	await loadDocumentsByStatus("Ожидание", "pendingDocuments");
 	await loadDocumentsByStatus("Подписанный", "approvedDocuments");
 	await loadDocumentsByStatus("Отклонённый", "rejectedDocuments");
+	clearTimeout(loaderTimeout); // Отмена таймера, если операция завершена до истечения 2 секунд
+	hideLoader();
 }
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -529,4 +532,14 @@ async function loadFooter() {
 	} catch (error) {
 		console.error("Ошибка при загрузке footer:", error);
 	}
+}
+
+// Функция для отображения анимации загрузки
+function showLoader() {
+	document.getElementById("loaderContainer").style.display = "flex";
+}
+
+// Функция для скрытия анимации загрузки
+function hideLoader() {
+	document.getElementById("loaderContainer").style.display = "none";
 }
