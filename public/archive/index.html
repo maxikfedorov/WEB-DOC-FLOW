@@ -5,42 +5,42 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>АРХИВ</title>
-    <!-- <link rel="stylesheet" href="styles/style.css"> -->
-
     <link rel="stylesheet" href="styles/style-brutal.css" id="theme-link">
+    <link rel="stylesheet" href="../common/footer.css" id="theme-link">
     <link rel="shortcut icon" href="../media/favicon.ico" type="image/x-icon">
     <link rel="icon" href="../media/favicon.ico" type="image/x-icon">
 </head>
 
 <body>
-    <header>
-        <h1 id="pageTitle">АРХИВ</h1>
-        <div class="button-container">
-            <button id="emptyTrashButton">Очистить корзину</button>
-            <button id="viewHistoryButton">Просмотреть историю</button>
-            <button id="filterButton">Фильтровать</button>
-            <button id="themeToggleButton">Переключить тему</button>
-            <label class="switch">
-                <input type="checkbox" id="viewToggle">
-                <span class="slider round"></span>
-            </label>
-        </div>
-    </header>
+    <div id="mainContainer">
+        <header>
+            <h1 id="pageTitle">АРХИВ</h1>
+            <div class="button-container">
+                <button id="emptyTrashButton">Очистить корзину</button>
+                <button id="viewHistoryButton">Просмотреть историю</button>
+                <button id="filterButton">Фильтровать</button>
+                <button id="themeToggleButton">Переключить тему</button>
+                <label class="switch">
+                    <input type="checkbox" id="viewToggle">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+        </header>
 
-    <form id="uploadForm" enctype="multipart/form-data">
-        <label for="username">Имя пользователя:</label>
-        <input type="text" id="username" name="username" placeholder="Введите имя пользователя">
-        <br>
-        <div id="dropZone" class="drop-zone">
-            Перетащите файлы сюда или нажмите для выбора
-        </div>
-        <button type="submit">Загрузить</button>
-    </form>
+        <form id="uploadForm" enctype="multipart/form-data">
+            <label for="username">Имя пользователя:</label>
+            <input type="text" id="username" name="username" placeholder="Введите имя пользователя">
+            <br>
+            <div id="dropZone" class="drop-zone">
+                Перетащите файлы сюда или нажмите для выбора
+            </div>
+            <button type="submit">Загрузить</button>
+        </form>
 
-    <div id="fileCount">Количество файлов: 0</div>
+        <div id="fileCount">Количество файлов: 0</div>
 
-    <div id="fileList" class="list-view"></div> <!-- Добавлен класс list-view -->
-
+        <div id="fileList" class="list-view"></div> <!-- Добавлен класс list-view -->
+    </div>
     <!-- Модальное окно для фильтрации -->
     <div id="filterModal" class="modal">
         <div class="modal-content">
@@ -144,18 +144,7 @@
 
     <div id="successBanner">Файл успешно заменён!</div>
 
-    <!-- <footer>
-        <div class="footer-content">
-            <img src="../media/MIREA_logo.png" alt="MIREA Logo" class="footer-logo">
-            <div class="footer-text">
-                <h3>Система Управления Документами</h3>
-                <p>Версия проекта: 1.0.0</p>
-                <p>Федоров М.А., Матчин В.Т.</p>
-                <p>Институт информационных технологий, кафедра ИППО</p>
-                <p>© 2024 МИРЭА – Российский технологический университет</p>
-            </div>
-        </div>
-    </footer> -->
+    <div id="footerContainer"></div>
 
     <script src="script.js"></script>
 

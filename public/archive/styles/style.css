@@ -3,13 +3,17 @@
     src: url('../../fonts/Code New Roman.otf') format('truetype');
 }
 
-html {
+html, body {
+    font-family: 'Code New Roman', sans-serif;
     height: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
 }
 
-body {
-    font-family: 'Code New Roman', sans-serif;
-    margin: 40px;
+#mainContainer {
+    flex: 1;
+    margin: 40px; /* Переносим margin сюда */
 }
 
 /* Стили для header */
@@ -44,46 +48,7 @@ header .button-container {
     /* Промежуток между кнопками */
 }
 
-/* Стили для футера */
-footer {
-    background-color: #f5f5f5;
-    border-top: 2px solid #ccc;
-    padding: 20px 0;
-    text-align: center;
-    color: #333;
-    width: 100%;
-}
 
-.footer-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-    margin: 0 40px;
-}
-
-.footer-logo {
-    height: 50px;
-    width: auto;
-}
-
-.footer-text p {
-    margin: 5px 0;
-    font-size: 16px;
-    /* Увеличенный размер шрифта */
-    color: #333;
-    /* Цвет текста */
-}
-
-.footer-text h3 {
-    margin: 10px 0;
-    font-size: 18px;
-    /* Размер шрифта для заголовков */
-    font-weight: bold;
-    /* Жирный шрифт для заголовков */
-    color: #007bff;
-    /* Цвет заголовков */
-}
 
 @media (min-width: 600px) {
     .footer-content {

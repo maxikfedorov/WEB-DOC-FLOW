@@ -34,6 +34,7 @@ window.onload = function() {
 
 // Инициализация событий и элементов после загрузки DOM
 document.addEventListener('DOMContentLoaded', function() {
+    loadFooter();
     const dropZone = document.getElementById('dropZone');
     const fileInput = document.createElement('input');
     fileInput.type = 'file';
@@ -601,4 +602,19 @@ window.onload = function() {
     document.getElementById('viewToggle').checked = false;
     loadFiles();
 };
+
+async function loadFooter() {
+	const footerContainer = document.getElementById("footerContainer");
+	try {
+		const response = await fetch("../common/footer.html");
+		if (response.ok) {
+			const footerHTML = await response.text();
+			footerContainer.innerHTML = footerHTML;
+		} else {
+			console.error("Ошибка при загрузке footer");
+		}
+	} catch (error) {
+		console.error("Ошибка при загрузке footer:", error);
+	}
+}
 
