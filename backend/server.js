@@ -20,8 +20,8 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, '..', 'public'))); // Обновленный путь к статическим файлам
 
 // Настройка шаблонного движка EJS
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, '..', 'public', 'document-management'));
+// app.set('view engine', 'ejs');
+// app.set('views', path.join(__dirname, '..', 'public', 'document-management'));
 
 // Использование статических файлов
 app.use('/archive', express.static(path.join(__dirname, '..', 'public', 'archive'))); // Обновленный путь

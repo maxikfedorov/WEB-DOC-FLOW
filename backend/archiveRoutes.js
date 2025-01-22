@@ -8,6 +8,7 @@ const db = new Database(path.join(__dirname, '..', 'db', 'database.db')); // О�
 
 // Настройка хранилища для multer
 const storage = multer.memoryStorage();
+
 const upload = multer({
     storage: storage,
     limits: { fileSize: 100 * 1024 * 1024 }, // 100MB

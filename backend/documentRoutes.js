@@ -68,19 +68,19 @@ router.post("/upload", upload.single("docxFile"), async (req, res) => {
 });
 
 router.get("/documents", (req, res) => {
-	const stmt = db.prepare(`SELECT id, filename FROM documents`);
-	const documents = stmt.all();
-	res.json(documents);
+    const stmt = db.prepare(`SELECT id, filename FROM documents`);
+    const documents = stmt.all();
+    res.json(documents);
 });
 
 router.get("/documents/:id", (req, res) => {
-	const id = parseInt(req.params.id);
-	const stmt = db.prepare(`SELECT * FROM documents WHERE id = ?`);
-	const document = stmt.get(id);
-	if (!document) {
-		return res.status(404).send("Документ не найден");
-	}
-	res.json(document);
+    const id = parseInt(req.params.id);
+    const stmt = db.prepare(`SELECT * FROM documents WHERE id = ?`);
+    const document = stmt.get(id);
+    if (!document) {
+        return res.status(404).send("Документ не найден");
+    }
+    res.json(document);
 });
 
 router.get("/documents/:id/comments", (req, res) => {
@@ -151,11 +151,11 @@ router.post("/archive/:id", (req, res) => {
 
 // Маршрут для изменения статуса документа
 router.post('/update-status/:id', (req, res) => {
-  const id = parseInt(req.params.id);
-  const newStatus = req.body.status;
-  const updateStmt = db.prepare(`UPDATE documents SET status = ? WHERE id = ?`);
-  updateStmt.run(newStatus, id);
-  res.sendStatus(200);
+    const id = parseInt(req.params.id);
+    const newStatus = req.body.status;
+    const updateStmt = db.prepare(`UPDATE documents SET status = ? WHERE id = ?`);
+    updateStmt.run(newStatus, id);
+    res.sendStatus(200);
 });
 
 router.post("/sign/:id", (req, res) => {
@@ -212,37 +212,37 @@ router.post('/reject/:id', (req, res) => {
 
 // Маршрут для отзыва документа
 router.post('/revoke/:id', (req, res) => {
-  const id = parseInt(req.params.id);
-  const updateStmt = db.prepare(`UPDATE documents SET status = 'Ожидание' WHERE id = ?`);
-  updateStmt.run(id);
-  res.sendStatus(200);
+    const id = parseInt(req.params.id);
+    const updateStmt = db.prepare(`UPDATE documents SET status = 'Ожидание' WHERE id = ?`);
+    updateStmt.run(id);
+    res.sendStatus(200);
 });
 
 // Маршрут для пересмотра документа
 router.post('/review/:id', (req, res) => {
-  const id = parseInt(req.params.id);
-  const updateStmt = db.prepare(`UPDATE documents SET status = 'Ожидание' WHERE id = ?`);
-  updateStmt.run(id);
-  res.sendStatus(200);
+    const id = parseInt(req.params.id);
+    const updateStmt = db.prepare(`UPDATE documents SET status = 'Ожидание' WHERE id = ?`);
+    updateStmt.run(id);
+    res.sendStatus(200);
 });
 
 // Маршрут для уничтожения документа
 router.post('/destroy/:id', (req, res) => {
-  const id = parseInt(req.params.id);
+    const id = parseInt(req.params.id);
 
-  // Удаление зависимых записей из таблицы rejection_comments
-  const deleteRejectionCommentsStmt = db.prepare(`DELETE FROM rejection_comments WHERE documentId = ?`);
-  deleteRejectionCommentsStmt.run(id);
+    // Удаление зависимых записей из таблицы rejection_comments
+    const deleteRejectionCommentsStmt = db.prepare(`DELETE FROM rejection_comments WHERE documentId = ?`);
+    deleteRejectionCommentsStmt.run(id);
 
-  // Удаление зависимых записей из таблицы comments
-  const deleteCommentsStmt = db.prepare(`DELETE FROM comments WHERE fileId = ?`);
-  deleteCommentsStmt.run(id);
+    // Удаление зависимых записей из таблицы comments
+    const deleteCommentsStmt = db.prepare(`DELETE FROM comments WHERE fileId = ?`);
+    deleteCommentsStmt.run(id);
 
-  // Удаление самого документа
-  const deleteStmt = db.prepare(`DELETE FROM documents WHERE id = ?`);
-  deleteStmt.run(id);
+    // Удаление самого документа
+    const deleteStmt = db.prepare(`DELETE FROM documents WHERE id = ?`);
+    deleteStmt.run(id);
 
-  res.sendStatus(200);
+    res.sendStatus(200);
 });
 
 
@@ -257,14 +257,12 @@ router.post('/update-title/:id', (req, res) => {
     res.sendStatus(200);
 });
 
-
-
 // Маршрут для получения документов по статусу
 router.get('/documents/status/:status', (req, res) => {
-  const status = req.params.status;
-  const stmt = db.prepare(`SELECT * FROM documents WHERE status = ?`);
-  const documents = stmt.all(status);
-  res.json(documents);
+    const status = req.params.status;
+    const stmt = db.prepare(`SELECT * FROM documents WHERE status = ?`);
+    const documents = stmt.all(status);
+    res.json(documents);
 });
 
 
